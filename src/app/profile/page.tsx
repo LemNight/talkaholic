@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
 
 export default function Profile() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -26,7 +27,7 @@ export default function Profile() {
       <h1 className="text-2xl font-bold mb-4">Profile</h1>
       {user ? (
         <div>
-          <p>Name: {user.user_metadata.name || "Not set"}</p>
+          <p>Name: {user.user_metadata?.name || "Not set"}</p>
           <p>Email: {user.email}</p>
         </div>
       ) : (

@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { Session } from "@supabase/supabase-js";
 
 export default function Header() {
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -51,12 +52,21 @@ export default function Header() {
           {session ? (
             <>
               <li><Link href="/profile">Profile</Link></li>
-              <li><button onClick={async () => { await supabase.auth.signOut(); setSession(null); }}>Logout</button></li>
+              <li>
+                <button
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    setSession(null);
+                  }}
+                >
+                  Logout
+                </button>
+              </li>
             </>
           ) : (
             <>
-              <li><button onClick={() => alert("Redirect to login soon!")}>Login</button></li>
-              <li><button onClick={() => alert("Redirect to signup soon!")}>Create Account</button></li>
+              <li><Link href="/login">Login</Link></li>
+              <li><Link href="/signup">Create Account</Link></li>
             </>
           )}
         </ul>

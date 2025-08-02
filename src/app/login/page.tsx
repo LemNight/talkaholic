@@ -11,14 +11,14 @@ export default function Login() {
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) setError(error.message);
-  else {
-    const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
-    router.push(redirectTo);
-  }
-};
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setError(error.message);
+    else {
+      const redirectTo = new URLSearchParams(window.location.search).get("redirect") || "/";
+      router.push(redirectTo);
+    }
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -31,6 +31,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border rounded"
+            required
           />
         </div>
         <div>
@@ -40,6 +41,7 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border rounded"
+            required
           />
         </div>
         {error && <p className="text-red-500">{error}</p>}

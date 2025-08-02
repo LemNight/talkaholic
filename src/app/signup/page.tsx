@@ -13,9 +13,13 @@ export default function Signup() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    });
     if (error) setError(error.message);
-    else router.push("/login"); // Redirect to login after signup
+    else router.push("/login");
   };
 
   return (
@@ -29,6 +33,7 @@ export default function Signup() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full p-2 border rounded"
+            required
           />
         </div>
         <div>
@@ -38,6 +43,7 @@ export default function Signup() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border rounded"
+            required
           />
         </div>
         <div>
@@ -47,6 +53,7 @@ export default function Signup() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border rounded"
+            required
           />
         </div>
         {error && <p className="text-red-500">{error}</p>}

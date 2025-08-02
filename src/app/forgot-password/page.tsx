@@ -29,9 +29,10 @@ export default function ForgotPassword() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border rounded"
+            required
           />
         </div>
-        {message && <p className="text-green-500">{message}</p>}
+        {message && <p className={message.startsWith("Error") ? "text-red-500" : "text-green-500"}>{message}</p>}
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
           Send Reset Link
         </button>
