@@ -10,10 +10,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="flex flex-col min-h-screen">
+    <html lang="en" dir="ltr" suppressHydrationWarning>
+      <head>
+        <title>{metadata.title}</title>
+        <meta name="description" content={metadata.description} />
+      </head>
+      <body className="flex flex-col min-h-screen bg-white text-gray-800">
         <Header />
-        <main className="flex-grow">{children}</main>
+        <main className="flex-grow px-4 py-6">{children}</main>
         <Footer />
       </body>
     </html>

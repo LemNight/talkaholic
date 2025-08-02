@@ -26,48 +26,51 @@ export default function Header() {
     };
   }, []);
 
-  if (loading) {
-    return (
-      <header className="bg-black text-white py-4">
-        <nav className="container mx-auto flex justify-between">
-          <div className="text-xl">Talkaholic</div>
-          <ul className="flex space-x-4">
-            <li><Link href="/about">About</Link></li>
-            <li><Link href="/events">Events</Link></li>
-            <li><Link href="/trivia">Trivia</Link></li>
-          </ul>
-        </nav>
-      </header>
-    );
-  }
+  const commonLinks = (
+    <>
+      <li><Link href="/about">About</Link></li>
+      <li><Link href="/events">Events</Link></li>
+      <li><Link href="/trivia">Trivia</Link></li>
+    </>
+  );
 
   return (
     <header className="bg-black text-white py-4">
-      <nav className="container mx-auto flex justify-between">
-        <div className="text-xl">Talkaholic</div>
-        <ul className="flex space-x-4">
-          <li><Link href="/about">About</Link></li>
-          <li><Link href="/events">Events</Link></li>
-          <li><Link href="/trivia">Trivia</Link></li>
-          {session ? (
-            <>
-              <li><Link href="/profile">Profile</Link></li>
-              <li>
-                <button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    setSession(null);
-                  }}
-                >
-                  Logout
-                </button>
-              </li>
-            </>
-          ) : (
-            <>
-              <li><Link href="/login">Login</Link></li>
-              <li><Link href="/signup">Create Account</Link></li>
-            </>
+      <nav className="container mx-auto flex justify-between items-center px-4">
+        <div className="text-2xl font-bold">
+          <Link href="/">Talkaholic</Link>
+        </div>
+        <ul className="flex flex-wrap items-center gap-4 text-sm">
+          {commonLinks}
+          {!loading && (
+            session ? (
+              <>
+                <li><Link href="/profile">Profile</Link></li>
+                <li>
+                  <button
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setSession(null);
+                    }}
+                    className="px-3 py-1 rounded bg-red-600 hover:bg-red-700 transition"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li><Link href="/login">Login</Link></li>
+                <li>
+                  <Link
+                    href="/signup"
+                    className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 transition"
+                  >
+                    Create Account
+                  </Link>
+                </li>
+              </>
+            )
           )}
         </ul>
       </nav>

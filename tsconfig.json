@@ -1,23 +1,33 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es5", // Compatible with older browsers, but can be "es6" or later for modern apps
     "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
+    "allowJs": true, // Allows JS files in the project
+    "skipLibCheck": true, // Speeds up builds by skipping type checking of .d.ts files
+    "strict": true, // Enables all strict type-checking options
+    "forceConsistentCasingInFileNames": true, // Prevents case mismatch bugs
+    "noEmit": true, // Do not output compiled files (Next.js handles this)
+    "esModuleInterop": true, // Required for compatibility with CommonJS modules
+    "module": "esnext", // Recommended for Next.js
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": true,
+    "resolveJsonModule": true, // Allow importing .json files
+    "isolatedModules": true, // Required for Next.js with TypeScript
+    "jsx": "preserve", // Preserves JSX for Next.js to handle
+    "incremental": true, // Enables incremental compilation for faster builds
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts" // Useful for auto-generated types
+  ],
   "exclude": ["node_modules"]
 }

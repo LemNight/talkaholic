@@ -8,31 +8,64 @@ import { User } from "@supabase/supabase-js";
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) router.push("/login");
-      else setUser(user);
-      setLoading(false);
+    const fetchUser = async () => {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) {
+          setError("Failed to retrieve user.");
+          router.push("/login");
+          return;
+        }
+
+        if (!data.user) {
+          router.push("/login");
+        } else {
+          setUser(data.user);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("An unexpected error occurred.");
+        router.push("/login");
+      } finally {
+        setLoading(false);
+      }
     };
-    getUser();
+
+    fetchUser();
   }, [router]);
 
-  if (loading) return <div className="container mx-auto py-10">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10 text-center">
+        <p className="text-gray-600">Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10 text-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Profile</h1>
-      {user ? (
-        <div>
-          <p>Name: {user.user_metadata?.name || "Not set"}</p>
-          <p>Email: {user.email}</p>
-        </div>
-      ) : (
-        <p>Please log in to view your profile.</p>
-      )}
+      <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
+      <div className="bg-white shadow-md rounded p-6 max-w-md mx-auto space-y-3">
+        <p>
+          <strong>Name:</strong> {user?.user_metadata?.name || "Not provided"}
+        </p>
+        <p>
+          <strong>Email:</strong> {user?.email}
+        </p>
+      </div>
     </div>
   );
 }
