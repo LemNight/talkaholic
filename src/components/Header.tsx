@@ -34,6 +34,8 @@ export default function Header() {
     </>
   );
 
+  const isAdmin = session?.user.user_metadata?.username === "admin";
+
   return (
     <header className="bg-black text-white py-4">
       <nav className="container mx-auto flex justify-between items-center px-4">
@@ -57,6 +59,7 @@ export default function Header() {
                     Logout
                   </button>
                 </li>
+                {isAdmin && <li><Link href="/admin" className="px-3 py-1 rounded bg-green-600 hover:bg-green-700 transition">Admin Dashboard</Link></li>}
               </>
             ) : (
               <>
