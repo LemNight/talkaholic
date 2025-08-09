@@ -55,6 +55,7 @@ export default function AdminEvents() {
       const { data, error } = await supabase.from("events").select("*");
       if (error) throw error;
       setEvents(data || []);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Fetch error:", err.message);
       setError("Failed to load events. Please try again.");

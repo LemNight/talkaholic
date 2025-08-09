@@ -10,6 +10,7 @@ import Testimonials from "@/components/Testimonials";
 import { supabase } from "@/lib/supabase";
 
 export default function Home() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 

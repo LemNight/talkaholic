@@ -22,9 +22,10 @@ export default function Events() {
       try {
         const { data, error } = await supabase.from("events").select("*");
         if (error) throw error;
-        setEvents(data || []);
-      } catch (err: any) {
-        console.error("Error fetching events:", err.message);
+        setEvents((data as Event[]) || []);
+      } catch (err) {
+        const e = err as Error;
+        console.error("Error fetching events:", e.message);
         setError("Unable to load events. Please try again later.");
       } finally {
         setLoading(false);

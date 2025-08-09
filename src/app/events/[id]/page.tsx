@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
@@ -15,7 +15,6 @@ interface Event {
 
 export default function EventDetails() {
   const params = useParams();
-  const router = useRouter();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +25,14 @@ export default function EventDetails() {
         const { data, error } = await supabase
           .from("events")
           .select("*")
-          .eq("id", params?.id)
+          .eq("id", params?.id as string) // cast ensures correct type
           .single();
 
         if (error) throw error;
         setEvent(data);
-      } catch (err: any) {
-        console.error("Error fetching event:", err.message);
+      } catch (err) {
+        const e = err as Error;
+        console.error("Error fetching event:", e.message);
         setError("Failed to load event details. Please try again.");
       } finally {
         setLoading(false);
