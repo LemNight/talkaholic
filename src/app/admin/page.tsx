@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 import { Session } from "@supabase/supabase-js";
 
 export default function AdminDashboard() {
@@ -30,8 +30,16 @@ export default function AdminDashboard() {
 
   const isAdmin = session?.user?.user_metadata?.username === "admin";
 
+  useEffect(() => {
+    if (session && !isAdmin) {
+      router.push("/login");
+    } else if (!session) {
+      console.log("No active session. Please log in as admin.");
+      router.push("/login");
+    }
+  }, [session, isAdmin, router]);
+
   if (!session || !isAdmin) {
-    router.replace("/login");
     return (
       <div className="container mx-auto py-10 text-center text-gray-600">
         Redirecting...
@@ -41,7 +49,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.replace("/login");
+    router.push("/login");
   };
 
   return (

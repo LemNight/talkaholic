@@ -45,6 +45,9 @@ export default function AddEvent() {
   useEffect(() => {
     if (session && !isAdmin) {
       router.push("/login");
+    } else if (!session) {
+      console.log("No active session. Please log in as admin.");
+      router.push("/login");
     } else if (session && isAdmin) {
       setLoading(false);
     }
