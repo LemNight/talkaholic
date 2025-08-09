@@ -2,59 +2,47 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
 
-  const handleReset = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
-    });
-    setLoading(false);
+    setMessage(null);
+    setError(null);
 
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     if (error) {
-      setMessage("Error: " + error.message);
+      setError(error.message);
     } else {
-      setMessage("Check your email for a reset link.");
+      setMessage("Password reset link sent. Check your email.");
     }
   };
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Forgot Password</h1>
-      <form onSubmit={handleReset} className="max-w-md mx-auto space-y-4">
+    <div className="container mx-auto py-10 max-w-md">
+      <h1 className="text-2xl font-bold mb-6">Forgot Password</h1>
+      {message && <p className="text-green-600 mb-4">{message}</p>}
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block">Email</label>
+          <label htmlFor="email" className="block text-gray-700">Email</label>
           <input
-            id="email"
-            name="email"
             type="email"
-            autoComplete="email"
+            id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-2 border rounded"
             required
           />
         </div>
-        {message && (
-          <p className={message.startsWith("Error") ? "text-red-500" : "text-green-500"}>
-            {message}
-          </p>
-        )}
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-          disabled={loading}
-        >
-          {loading ? "Sending..." : "Send Reset Link"}
+        <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Send Reset Link
         </button>
-        <a href="/login" className="text-blue-600">Back to Login</a>
       </form>
     </div>
   );
