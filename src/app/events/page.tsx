@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Session } from "@supabase/supabase-js";
+import Link from "next/link";
 
 interface Event {
   id: string;
@@ -12,62 +12,66 @@ interface Event {
   creator_id: string;
 }
 
-export default function EventsPage() {
+export default function Events() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
-    };
-    fetchSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => authListener.subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setLoading(true);
         const { data, error } = await supabase.from("events").select("*");
         if (error) throw error;
         setEvents(data || []);
-      } catch (err: any) { // Fixed to specific error type if needed
-        setError("Failed to load events.");
-        console.error(err.message);
+      } catch (err: any) {
+        console.error("Error fetching events:", err.message);
+        setError("Unable to load events. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchEvents();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  const renderEventItem = (event: Event) => (
+    <li
+      key={event.id}
+      className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition duration-300"
+    >
+      <h2 className="text-xl font-semibold text-gray-900">{event.name}</h2>
+      <p className="text-gray-600 mt-2">
+        Date: {new Date(event.date).toLocaleDateString()}
+      </p>
+      <p className="text-gray-500 mt-1">{event.description}</p>
+      <Link
+        href={`/events/${event.id}`}
+        className="mt-2 inline-block text-blue-600 hover:text-blue-800 font-medium"
+      >
+        View Details
+      </Link>
+    </li>
+  );
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold">Events</h1>
-      {events.length > 0 ? (
-        <ul className="space-y-4">
-          {events.map((event) => (
-            <li key={event.id} className="bg-white shadow-md p-4 rounded">
-              <h2 className="text-xl font-semibold">{event.name}</h2>
-              <p>Date: {new Date(event.date).toLocaleDateString()}</p>
-              <p>{event.description}</p>
-              <a href={`/events/${event.id}`} className="text-blue-600 hover:underline">View Details</a>
-            </li>
-          ))}
-        </ul>
+    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">All Events</h1>
+
+      {loading ? (
+        <p className="text-center text-gray-500">Loading events...</p>
+      ) : error ? (
+        <p className="text-center text-red-500">{error}</p>
+      ) : events.length > 0 ? (
+        <ul className="space-y-4">{events.map(renderEventItem)}</ul>
       ) : (
-        <p>No events available.</p>
+        <p className="text-center text-gray-600">No events available at the moment.</p>
       )}
+
+      <div className="mt-6 text-center">
+        <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
+          Back to Home
+        </Link>
+      </div>
     </div>
   );
 }
