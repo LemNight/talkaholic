@@ -41,9 +41,12 @@ export default function AdminEvents() {
 
   const isAdmin = session?.user?.user_metadata?.username === "admin";
 
-  // Redirect non-admins
+  // Redirect non-admins or handle no session
   useEffect(() => {
     if (session && !isAdmin) {
+      router.push("/login");
+    } else if (!session) {
+      console.log("No active session. Please log in as admin.");
       router.push("/login");
     }
   }, [session, isAdmin, router]);
