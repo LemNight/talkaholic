@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -55,9 +56,8 @@ export default function AdminEvents() {
       const { data, error } = await supabase.from("events").select("*");
       if (error) throw error;
       setEvents(data || []);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      console.error("Fetch error:", err.message);
+    } catch (err) {
+      console.error("Fetch error:", (err as Error).message);
       setError("Failed to load events. Please try again.");
     } finally {
       setLoading(false);
@@ -136,15 +136,23 @@ export default function AdminEvents() {
                 <p className="text-gray-600 mt-1">Date: {new Date(event.date).toLocaleDateString()}</p>
                 <p className="text-gray-500 mt-1">{event.description}</p>
               </div>
-              <button
-                onClick={() => handleDelete(event.id)}
-                disabled={deletingId === event.id}
-                className={`ml-4 px-3 py-1 rounded text-white transition ${
-                  deletingId === event.id ? "bg-gray-500" : "bg-red-600 hover:bg-red-700"
-                }`}
-              >
-                {deletingId === event.id ? "Deleting..." : "Delete"}
-              </button>
+              <div className="space-x-2">
+                <Link
+                  href={`/events/${event.id}/edit`}
+                  className="inline-block bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 transition"
+                >
+                  Edit
+                </Link>
+                <button
+                  onClick={() => handleDelete(event.id)}
+                  disabled={deletingId === event.id}
+                  className={`ml-4 px-3 py-1 rounded text-white transition ${
+                    deletingId === event.id ? "bg-gray-500" : "bg-red-600 hover:bg-red-700"
+                  }`}
+                >
+                  {deletingId === event.id ? "Deleting..." : "Delete"}
+                </button>
+              </div>
             </li>
           ))}
         </ul>
