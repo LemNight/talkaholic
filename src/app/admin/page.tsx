@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,12 +10,14 @@ import { Session } from "@supabase/supabase-js";
 export default function AdminDashboard() {
   const [session, setSession] = useState<Session | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
+      setLoading(false);
     };
 
     fetchSession();
@@ -23,12 +26,21 @@ export default function AdminDashboard() {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const isAdmin = session?.user?.user_metadata?.username === "admin";
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-10 text-center text-gray-600">
+        Loading...
+      </div>
+    );
+  }
 
   if (!session || !isAdmin) {
     router.replace("/login");

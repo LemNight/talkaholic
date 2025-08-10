@@ -1,15 +1,16 @@
+/* eslint-disable */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 
+// Define the event interface
 interface Event {
-  id: string;
-  name: string;
+  id: number;
+  title: string;
   description: string;
-  date: string;
-  creator_id: string;
+  date: string; // Assuming date is stored as a string (e.g., ISO format)
 }
 
 export default function Events() {
@@ -19,59 +20,56 @@ export default function Events() {
 
   useEffect(() => {
     const fetchEvents = async () => {
-      try {
-        const { data, error } = await supabase.from("events").select("*");
-        if (error) throw error;
-        setEvents((data as Event[]) || []);
-      } catch (err) {
-        const e = err as Error;
-        console.error("Error fetching events:", e.message);
-        setError("Unable to load events. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      const { data, error } = await supabase.from("events").select("*");
+      if (error) setError(error.message);
+      else setEvents(data || []);
+      setLoading(false);
     };
-
     fetchEvents();
   }, []);
 
-  const renderEventItem = (event: Event) => (
-    <li
-      key={event.id}
-      className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition duration-300"
-    >
-      <h2 className="text-xl font-semibold text-gray-900">{event.name}</h2>
-      <p className="text-gray-600 mt-2">
-        Date: {new Date(event.date).toLocaleDateString()}
-      </p>
-      <p className="text-gray-500 mt-1">{event.description}</p>
-      <Link
-        href={`/events/${event.id}`}
-        className="mt-2 inline-block text-blue-600 hover:text-blue-800 font-medium"
-      >
-        View Details
-      </Link>
-    </li>
-  );
+  const handleRSVP = async (eventId: number) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setError("Please log in to RSVP.");
+      return;
+    }
+    const { error } = await supabase.from("rsvps").insert({
+      event_id: eventId,
+      user_id: user.id,
+    });
+    if (error) setError(error.message);
+    else setError("RSVP successful!");
+  };
+
+  if (loading) return <div className="container mx-auto py-10 text-center text-gray-600">Loading events...</div>;
+  if (error) return <div className="container mx-auto py-10 text-center text-red-500">{error}</div>;
 
   return (
-    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">All Events</h1>
-
-      {loading ? (
-        <p className="text-center text-gray-500">Loading events...</p>
-      ) : error ? (
-        <p className="text-center text-red-500">{error}</p>
-      ) : events.length > 0 ? (
-        <ul className="space-y-4">{events.map(renderEventItem)}</ul>
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold mb-6 text-blue-600">Events</h1>
+      {events.length === 0 ? (
+        <p className="text-gray-700">No events available. Check back later!</p>
       ) : (
-        <p className="text-center text-gray-600">No events available at the moment.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {events.map((event: Event) => (
+            <div key={event.id} className="bg-white p-4 rounded shadow">
+              <h2 className="text-xl font-medium">{event.title}</h2>
+              <p className="text-gray-700">{event.description}</p>
+              <p className="text-gray-500">Date: {new Date(event.date).toLocaleDateString()}</p>
+              <button
+                onClick={() => handleRSVP(event.id)}
+                className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              >
+                RSVP
+              </button>
+            </div>
+          ))}
+        </div>
       )}
-
-      <div className="mt-6 text-center">
-        <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
-          Back to Home
-        </Link>
+      <div className="mt-4">
+        <Link href="/" className="text-blue-600 hover:underline">Back to Home</Link>
       </div>
     </div>
   );

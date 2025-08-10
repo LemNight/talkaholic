@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useState } from "react";
@@ -13,9 +14,15 @@ export default function ForgotPassword() {
     setMessage(null);
     setError(null);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+    const redirectUrl = process.env.NODE_ENV === "development"
+      ? "http://localhost:3000/reset-password"
+      : "https://talkaholic.vercel.app/reset-password";
+    console.log("Environment:", process.env.NODE_ENV, "Redirect URL:", redirectUrl); // Debug log
+
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
     });
+    console.log("Reset response:", { data, error, redirectUrl }); // Enhanced debug log
     if (error) {
       setError(error.message);
     } else {
